@@ -2,6 +2,7 @@ package autoservice.service;
 
 import autoservice.dto.CarServiceMastersQuery;
 import autoservice.dto.OrderQuery;
+import autoservice.enums.SortCarServiceMasters;
 import autoservice.model.CarServiceMaster;
 import autoservice.model.Order;
 import autoservice.model.RepairOrder;
@@ -11,12 +12,9 @@ import autoservice.repository.OrderRepository;
 import autoservice.repository.WorkshopPlaceRepository;
 import autoservice.repository.impl.RepairOrderRepository;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
 
 public class AutoServiceAdmin {
     private final MasterRepository masterRepository;
@@ -38,11 +36,15 @@ public class AutoServiceAdmin {
                         || o.getAssignPerson().equals(orderQuery.carServiceMaster()))
                 .filter(o -> orderQuery.status() == null
                         || o.getStatus().equals(orderQuery.status()))
-                .filter(o -> orderQuery.startDateTime() == null
-                        || o.getStartDateTime().isAfter(orderQuery.startDateTime()))
-                .filter(o -> orderQuery.endDateTime() == null
-                        || o.getEndDateTime().isBefore(orderQuery.endDateTime()))
+                .filter(o -> orderQuery.startDate() == null
+                        || o.getStartDate().isAfter(orderQuery.startDate()))
+                .filter(o -> orderQuery.endDate() == null
+                        || o.getEndDate().isBefore(orderQuery.endDate()))
                 .toList();
+    }
+
+    private boolean isDateInRange(LocalDate dateToCheck, LocalDate startDate, LocalDate endDate) {
+        return !dateToCheck.isBefore(startDate) && !dateToCheck.isAfter(endDate);
     }
 
     public void addMaster(CarServiceMaster master) {
@@ -61,13 +63,11 @@ public class AutoServiceAdmin {
         workshopPlaceRepository.removePlace(place);
     }
 
-    public UUID createRepairOrder(LocalDateTime start, LocalDateTime end,
+    public UUID createRepairOrder(LocalDate start, LocalDate end,
                                   String description, CarServiceMaster master, WorkshopPlace place) {
-        master.setBusy(true);
         RepairOrder order = new RepairOrder(start, end, description);
         order.assignPerson(master);
         order.setWorkshopPlace(place);
-        place.setOccupied(true);
         ordersRepository.addOrder(order);
         return order.getId();
     }
@@ -76,7 +76,6 @@ public class AutoServiceAdmin {
         RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
         if (order == null) return;
         CarServiceMaster master = (CarServiceMaster) order.getAssignPerson();
-        master.setBusy(false);
         ordersRepository.cancelOrder(order);
     }
 
@@ -84,7 +83,6 @@ public class AutoServiceAdmin {
         RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
         if (order == null) return;
         CarServiceMaster master = (CarServiceMaster) order.getAssignPerson();
-        master.setBusy(false);
         ordersRepository.closeOrder(order);
     }
 
@@ -92,22 +90,19 @@ public class AutoServiceAdmin {
         RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
         if (order == null) return;
         CarServiceMaster master = (CarServiceMaster) order.getAssignPerson();
-        master.setBusy(false);
         deletedOrdersRepository.addOrder(order);
         ordersRepository.removeOrder(order);
     }
 
-    public void delayOrder(UUID orderId, Duration duration) {
+    public void delayOrder(UUID orderId, Period period) {
         RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
         if (order == null) return;
-        order.setEndDateTime(order.getEndDateTime().plus(duration));
+        order.setEndDate(order.getEndDate().plus(period));
         ordersRepository.updateOrder(order);
     }
 
-    public String getOrderInfo(UUID orderId) {
-        RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
-        if (order == null) return "Заказ не найден";
-        return order.toString();
+    public Optional<RepairOrder> getOrderById(UUID orderId) {
+        return ordersRepository.getOrderById(orderId);
     }
 
     public List<Order> getOrders(OrderQuery orderQuery) {
@@ -128,16 +123,68 @@ public class AutoServiceAdmin {
 
     public List<CarServiceMaster> getCarServiceMasters(CarServiceMastersQuery carServiceMastersQuery) {
         List<CarServiceMaster> masters = new ArrayList<>();
-        if(carServiceMastersQuery.orderId() != null){
-            CarServiceMaster master = (CarServiceMaster)
-                    (Objects.requireNonNull(ordersRepository.getOrderById(carServiceMastersQuery.orderId()).orElse(null)))
-                            .getAssignPerson();
-            masters.add(master);
+        if (carServiceMastersQuery.isOccupied() != null) {
+            List<Order> orders = ordersRepository.getAllOrders();
+            if (carServiceMastersQuery.isOccupied()) {
+                for (Order order : orders) {
+                    if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
+                        masters.add((CarServiceMaster) order.getAssignPerson());
+                    }
+                }
+            } else {
+                masters.addAll(masterRepository.getAllMasters());
+                for (Order order : orders) {
+                    if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
+                        masters.remove((CarServiceMaster) order.getAssignPerson());
+                    }
+                }
+            }
+        } else {
+            masters.addAll(masterRepository.getAllMasters());
         }
-        else {
-            masters = masterRepository.getAllMasters();
-            masters.sort(carServiceMastersQuery.sortCarServiceMasters().getComparator());
+        if (carServiceMastersQuery.sort() != null) {
+            masters.sort(carServiceMastersQuery.sort().getComparator());
+        } else {
+            masters.sort(Comparator.comparing(CarServiceMaster::getFullName));
         }
         return masters;
+    }
+
+    public Optional<CarServiceMaster> getMasterByOrder(UUID orderId) {
+        RepairOrder order = ordersRepository.getOrderById(orderId).orElse(null);
+        if (order == null) return Optional.empty();
+        return Optional.ofNullable((CarServiceMaster) order.getAssignPerson());
+    }
+
+    public List<WorkshopPlace> getAvailablePlaces(LocalDate localDate) {
+        List<WorkshopPlace> availablePlaces = workshopPlaceRepository.getAllPlaces();
+        List<Order> orders = ordersRepository.getAllOrders();
+        for (Order order : orders) {
+            if (isDateInRange(localDate, order.getStartDate(), order.getEndDate())) {
+                availablePlaces.remove(((RepairOrder) order).getWorkshopPlace());
+            }
+        }
+        return availablePlaces;
+    }
+
+    public int countAvailablePlaces(LocalDate date) {
+        int countPlaces = getAvailablePlaces(date).size();
+        int countMasters = (getCarServiceMasters(CarServiceMastersQuery.builder().
+                localDate(date)
+                .isOccupied(false)
+                .build()))
+                .size();
+        return Math.min(countPlaces, countMasters);
+    }
+
+    public Optional<LocalDate> getFirstAvailableSlot(LocalDate date){
+        int countAvailable = 0;
+        LocalDate endDate = date.plusDays(7);
+        while(date.isBefore(endDate)){
+            countAvailable = countAvailablePlaces(date);
+            if (countAvailable > 0) return Optional.of(date);
+            date = date.plusDays(1);
+        }
+        return Optional.empty();
     }
 }

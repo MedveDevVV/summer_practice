@@ -3,11 +3,9 @@ package autoservice.model;
 import java.time.LocalDate;
 
 public class CarServiceMaster extends Person {
-    private Boolean busy;
 
     public CarServiceMaster(String surname, String name, String patronymic, LocalDate dateOfBirth) {
         super(surname, name, patronymic, dateOfBirth);
-        busy = false;
     }
 
     @Override
@@ -22,11 +20,4 @@ public class CarServiceMaster extends Person {
         return getFullName().hashCode();
     }
 
-    public void setBusy(Boolean busy) {
-        this.busy = busy;
-    }
-
-    public Boolean getBusy() {
-        return busy;
-    }
 }

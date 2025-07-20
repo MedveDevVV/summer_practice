@@ -1,23 +1,28 @@
 package autoservice.model;
 
+import java.util.Objects;
+
 public class WorkshopPlace {
     private final String name;
-    private Boolean occupied;
 
     public WorkshopPlace(String name) {
         this.name = name;
-        this.occupied = false;
     }
 
     public String getName() {
         return name;
     }
 
-    public boolean isOccupied(){
-        return occupied;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkshopPlace that = (WorkshopPlace) o;
+        return Objects.equals(name, that.name);
     }
 
-    public void setOccupied(boolean occupied){
-        this.occupied = occupied;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }

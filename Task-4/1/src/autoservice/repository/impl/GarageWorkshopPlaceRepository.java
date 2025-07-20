@@ -3,6 +3,7 @@ package autoservice.repository.impl;
 import autoservice.model.WorkshopPlace;
 import autoservice.repository.WorkshopPlaceRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class GarageWorkshopPlaceRepository implements WorkshopPlaceRepository {
@@ -15,7 +16,6 @@ public class GarageWorkshopPlaceRepository implements WorkshopPlaceRepository {
 
     @Override
     public void removePlace(WorkshopPlace place) {
-        if (findByName(place.getName()).isOccupied()) return;
         places.remove(place.getName());
     }
 
@@ -27,17 +27,5 @@ public class GarageWorkshopPlaceRepository implements WorkshopPlaceRepository {
     @Override
     public WorkshopPlace findByName(String name) {
         return places.get(name);
-    }
-
-    @Override
-    public List<WorkshopPlace> getAvailablePlaces() {
-        List<WorkshopPlace> available = new ArrayList<>();
-        for(WorkshopPlace place : places.values()){
-            if (!place.isOccupied()){
-                available.add(place);
-            }
-        }
-        available.sort(Comparator.comparing(WorkshopPlace::getName));
-        return available;
     }
 }

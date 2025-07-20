@@ -5,8 +5,7 @@ import autoservice.model.CarServiceMaster;
 import java.util.Comparator;
 
 public enum SortCarServiceMasters {
-    NAME(Comparator.comparing(CarServiceMaster::getFullName)),
-    BUSY(Comparator.comparing(CarServiceMaster::getBusy));
+    NAME(Comparator.comparing(CarServiceMaster::getFullName));
 
     private final Comparator<CarServiceMaster> comparator;
 

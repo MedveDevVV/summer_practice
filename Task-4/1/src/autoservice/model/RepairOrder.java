@@ -2,19 +2,27 @@ package autoservice.model;
 
 import autoservice.enums.OrderStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class RepairOrder implements Order {
     private final UUID uuid;
     private CarServiceMaster carServiceMaster;
     private WorkshopPlace place;
-    private LocalDateTime startDateTime;
-    private LocalDateTime creationDateTime;
-    private LocalDateTime endDateTime;
+    private LocalDate startDate;
+    private LocalDate creationDate;
+    private LocalDate endDate;
     private String description;
     private OrderStatus status;
     private Float totalPrice;
+
+    public RepairOrder(LocalDate startDate, LocalDate endDate, String description) {
+        this.uuid = UUID.randomUUID();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+        this.status = OrderStatus.CREATED;
+    }
 
     @Override
     public Float getTotalPrice() {
@@ -22,28 +30,18 @@ public class RepairOrder implements Order {
     }
 
     @Override
-    public LocalDateTime getCreationDateTime() {
-        return creationDateTime;
-    }
-
-    public RepairOrder(LocalDateTime startDateTime, LocalDateTime endDateTime, String description) {
-        this.uuid = UUID.randomUUID();
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-        this.description = description;
-        this.status = OrderStatus.CREATED;
+    public LocalDate getCreationDate() {
+        return creationDate;
     }
 
     @Override
     public void cancel() {
         status = OrderStatus.CANCELLED;
-        place.setOccupied(false);
     }
 
     @Override
     public void closed() {
         status = OrderStatus.CLOSED;
-        place.setOccupied(false);
     }
 
     @Override
@@ -51,23 +49,9 @@ public class RepairOrder implements Order {
         this.carServiceMaster = (CarServiceMaster) person;
     }
 
-    public void setWorkshopPlace(WorkshopPlace place) {
-        this.place = place;
-        place.setOccupied(true);
-    }
-
     @Override
-    public void setStartDateTime(LocalDateTime startDateTime) {
-        this.startDateTime = startDateTime;
-    }
-
-    @Override
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        this.endDateTime = endDateTime;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Override
@@ -75,13 +59,9 @@ public class RepairOrder implements Order {
         return carServiceMaster;
     }
 
-    public WorkshopPlace getWorkshopPlace() {
-        return place;
-    }
-
     @Override
-    public LocalDateTime getStartDateTime() {
-        return startDateTime;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
     @Override
@@ -90,8 +70,8 @@ public class RepairOrder implements Order {
     }
 
     @Override
-    public LocalDateTime getEndDateTime() {
-        return endDateTime;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     @Override
@@ -114,8 +94,8 @@ public class RepairOrder implements Order {
         return "model.Order{" + " uuid=" + uuid + ", status=" + status +
                 "\nDescription=" + description + "\nPlace=" + place +
                 ", carServiceMaster=" + carServiceMaster +
-                ", starTime=" + startDateTime +
-                ", endTime=" + endDateTime + '}';
+                ", starDate=" + startDate +
+                ", endDate=" + endDate + '}';
     }
 
     @Override
@@ -129,5 +109,21 @@ public class RepairOrder implements Order {
     @Override
     public int hashCode() {
         return uuid.hashCode();
+    }
+
+    public void setWorkshopPlace(WorkshopPlace place) {
+        this.place = place;
+    }
+
+    public WorkshopPlace getWorkshopPlace() {
+        return place;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

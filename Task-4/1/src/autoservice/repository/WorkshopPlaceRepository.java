@@ -2,6 +2,7 @@ package autoservice.repository;
 
 import autoservice.model.WorkshopPlace;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface WorkshopPlaceRepository {
@@ -9,5 +10,4 @@ public interface WorkshopPlaceRepository {
     void removePlace(WorkshopPlace place);
     List<WorkshopPlace> getAllPlaces();
     WorkshopPlace findByName(String name);
-    List<WorkshopPlace> getAvailablePlaces();
 }

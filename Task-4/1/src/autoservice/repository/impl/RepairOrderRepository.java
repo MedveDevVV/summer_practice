@@ -4,7 +4,7 @@ import autoservice.model.Order;
 import autoservice.model.RepairOrder;
 import autoservice.repository.OrderRepository;
 
-import java.time.Duration;
+import java.time.Period;
 import java.util.*;
 
 public class RepairOrderRepository implements OrderRepository {
@@ -19,20 +19,22 @@ public class RepairOrderRepository implements OrderRepository {
     public void updateOrder(Order modifiedOrder) {
         RepairOrder curOrder = (RepairOrder) modifiedOrder;
         RepairOrder nextOrder;
-        Duration duration;
-        orders.sort(Comparator.comparing(Order::getStartDateTime));
+        Period period;
+        orders.sort(Comparator.comparing(Order::getStartDate));
         int curIndex = orders.indexOf((RepairOrder) curOrder);
 
         while (curIndex + 1 < orders.size()) {
             nextOrder = orders.get(curIndex + 1);
-            if (curOrder.getEndDateTime().isAfter(nextOrder.getStartDateTime())
+            if ((curOrder.getEndDate().equals(nextOrder.getStartDate())
+                    || curOrder.getEndDate().isAfter(nextOrder.getStartDate()))
                     && (curOrder.getWorkshopPlace() == nextOrder.getWorkshopPlace()
                     || curOrder.getAssignPerson() == nextOrder.getAssignPerson())) {
-                duration = Duration.between(nextOrder.getStartDateTime(), curOrder.getEndDateTime());
+                //  даты не должны пересекаться, поэтому смещение идет как минимум на 1 день
+                period = (Period.between(nextOrder.getStartDate(), curOrder.getEndDate())).plus(Period.ofDays(1));
                 curOrder = nextOrder;
                 curIndex += 1;
-                curOrder.setStartDateTime(curOrder.getStartDateTime().plus(duration));
-                curOrder.setEndDateTime(curOrder.getEndDateTime().plus(duration));
+                curOrder.setStartDate(curOrder.getStartDate().plus(period));
+                curOrder.setEndDate(curOrder.getEndDate().plus(period));
             } else break;
         }
     }

@@ -1,17 +1,47 @@
 package autoservice.dto;
 
 import autoservice.enums.SortCarServiceMasters;
-import autoservice.model.RepairOrder;
 
+import java.time.LocalDate;
 import java.util.Objects;
-import java.util.UUID;
 
 public record CarServiceMastersQuery(
-        UUID orderId,
-        SortCarServiceMasters sortCarServiceMasters
+        LocalDate localDate,
+        Boolean isOccupied,
+        SortCarServiceMasters sort
 ) {
-
     public CarServiceMastersQuery {
-        Objects.requireNonNull(sortCarServiceMasters, "sortCarServiceMasters cannot be null");
+        Objects.requireNonNull(localDate, "localDate cannot be null");
     }
+
+        public static Builder builder() {
+        return new Builder();
+    }
+
+        public static final class Builder {
+            private LocalDate localDate;
+            private Boolean isOccupied;
+            private SortCarServiceMasters sort;
+
+            private Builder() {}
+
+            public Builder localDate(LocalDate localDate) {
+                this.localDate = Objects.requireNonNull(localDate);
+                return this;
+            }
+
+            public Builder isOccupied(Boolean isOccupied) {
+                this.isOccupied = isOccupied;
+                return this;
+            }
+
+            public Builder sort(SortCarServiceMasters sort) {
+                this.sort = sort;
+                return this;
+            }
+
+            public CarServiceMastersQuery build() {
+                return new CarServiceMastersQuery(localDate, isOccupied, sort);
+            }
+        }
 }
