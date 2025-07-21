@@ -63,9 +63,9 @@ public class AutoServiceAdmin {
         workshopPlaceRepository.removePlace(place);
     }
 
-    public UUID createRepairOrder(LocalDate start, LocalDate end,
+    public UUID createRepairOrder(LocalDate creationDate, LocalDate start, LocalDate end,
                                   String description, CarServiceMaster master, WorkshopPlace place) {
-        RepairOrder order = new RepairOrder(start, end, description);
+        RepairOrder order = new RepairOrder(creationDate, start, end, description);
         order.assignPerson(master);
         order.setWorkshopPlace(place);
         ordersRepository.addOrder(order);

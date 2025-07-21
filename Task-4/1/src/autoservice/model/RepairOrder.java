@@ -10,14 +10,15 @@ public class RepairOrder implements Order {
     private CarServiceMaster carServiceMaster;
     private WorkshopPlace place;
     private LocalDate startDate;
-    private LocalDate creationDate;
+    private final LocalDate creationDate;
     private LocalDate endDate;
     private String description;
     private OrderStatus status;
     private Float totalPrice;
 
-    public RepairOrder(LocalDate startDate, LocalDate endDate, String description) {
+    public RepairOrder(LocalDate creationDate, LocalDate startDate, LocalDate endDate, String description) {
         this.uuid = UUID.randomUUID();
+        this.creationDate = creationDate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.description = description;

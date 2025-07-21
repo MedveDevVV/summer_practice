@@ -25,8 +25,7 @@ public class RepairOrderRepository implements OrderRepository {
 
         while (curIndex + 1 < orders.size()) {
             nextOrder = orders.get(curIndex + 1);
-            if ((curOrder.getEndDate().equals(nextOrder.getStartDate())
-                    || curOrder.getEndDate().isAfter(nextOrder.getStartDate()))
+            if (!curOrder.getEndDate().isBefore(nextOrder.getStartDate())
                     && (curOrder.getWorkshopPlace() == nextOrder.getWorkshopPlace()
                     || curOrder.getAssignPerson() == nextOrder.getAssignPerson())) {
                 //  даты не должны пересекаться, поэтому смещение идет как минимум на 1 день

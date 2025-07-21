@@ -40,15 +40,15 @@ public class Main {
 
         // Создание заказа
         LocalDate date_1 = LocalDate.of(2025,07,13);
-        UUID idOrder1 = admin.createRepairOrder(date_1, date_1,
+        UUID idOrder1 = admin.createRepairOrder(date_1, date_1, date_1,
                 "Ремонт двигателя", master_1, place_1);
 
         System.out.println("\nСоздан заказ_1:");
         System.out.println(admin.getOrderById(idOrder1));
 
         LocalDate date_2 = LocalDate.of(2025, 07, 13);
-        UUID idOrder2 = admin.createRepairOrder(date_2, date_2.plusDays(1),
-                "Замена тормозных колодок", master_2, place_2);
+        UUID idOrder2 = admin.createRepairOrder(date_1, date_2, date_2.plusDays(1),
+                "Замена тормозных колодок", master_1, place_2);
 
         System.out.println("\nСоздан заказ_2:");
         System.out.println(admin.getOrderById(idOrder2));
