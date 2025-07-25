@@ -118,32 +118,31 @@ public class AutoServiceAdmin {
         return orders;
     }
 
+    public List<CarServiceMaster> getCarServiceMasters() {
+        List<CarServiceMaster> masters = new ArrayList<>(masterRepository.getAllMasters());
+        masters.sort(Comparator.comparing(CarServiceMaster::getFullName));
+        return masters;
+    }
+
     public List<CarServiceMaster> getCarServiceMasters(CarServiceMastersQuery carServiceMastersQuery) {
+        Objects.requireNonNull(carServiceMastersQuery, "carServiceMastersQuery cannot be null");
         List<CarServiceMaster> masters = new ArrayList<>();
-        if (carServiceMastersQuery.isOccupied() != null) {
-            List<Order> orders = ordersRepository.getAllOrders();
-            if (carServiceMastersQuery.isOccupied()) {
-                for (Order order : orders) {
-                    if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
-                        masters.add((CarServiceMaster) order.getAssignPerson());
-                    }
-                }
-            } else {
-                masters.addAll(masterRepository.getAllMasters());
-                for (Order order : orders) {
-                    if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
-                        masters.remove((CarServiceMaster) order.getAssignPerson());
-                    }
+        List<Order> orders = ordersRepository.getAllOrders();
+        if (carServiceMastersQuery.isOccupied()) {
+            for (Order order : orders) {
+                if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
+                    masters.add((CarServiceMaster) order.getAssignPerson());
                 }
             }
         } else {
             masters.addAll(masterRepository.getAllMasters());
+            for (Order order : orders) {
+                if (isDateInRange(carServiceMastersQuery.localDate(), order.getStartDate(), order.getEndDate())) {
+                    masters.remove((CarServiceMaster) order.getAssignPerson());
+                }
+            }
         }
-        if (carServiceMastersQuery.sort() != null) {
-            masters.sort(carServiceMastersQuery.sort().getComparator());
-        } else {
-            masters.sort(Comparator.comparing(CarServiceMaster::getFullName));
-        }
+        masters.sort(carServiceMastersQuery.sort().getComparator());
         return masters;
     }
 
@@ -174,10 +173,10 @@ public class AutoServiceAdmin {
         return Math.min(countPlaces, countMasters);
     }
 
-    public Optional<LocalDate> getFirstAvailableSlot(LocalDate date){
+    public Optional<LocalDate> getFirstAvailableSlot(LocalDate date) {
         int countAvailable = 0;
         LocalDate endDate = date.plusDays(7);
-        while(date.isBefore(endDate)){
+        while (date.isBefore(endDate)) {
             countAvailable = countAvailablePlaces(date);
             if (countAvailable > 0) return Optional.of(date);
             date = date.plusDays(1);

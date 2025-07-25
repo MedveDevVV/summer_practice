@@ -20,7 +20,7 @@ public class RemoveMasterAction implements IAction {
     @Override
     public void execute() {
         System.out.println("\nУдаление мастера:");
-        List<CarServiceMaster> masters = admin.getCarServiceMasters(null);
+        List<CarServiceMaster> masters = admin.getCarServiceMasters();
 
         if (masters.isEmpty()) {
             System.out.println("Нет доступных мастеров!");
@@ -34,6 +34,7 @@ public class RemoveMasterAction implements IAction {
 
         System.out.print("Выберите номер мастера для удаления: ");
         int choice = scanner.nextInt();
+        scanner.nextLine();
 
         if (choice > 0 && choice <= masters.size()) {
             admin.removeMaster(masters.get(choice - 1));

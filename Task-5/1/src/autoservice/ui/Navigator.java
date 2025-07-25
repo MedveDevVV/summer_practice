@@ -33,7 +33,7 @@ public class Navigator {
 
         // Вывод пунктов меню
         for (int i = 0; i < currentMenu.getMenuItems().size(); i++) {
-            System.out.println((i + 1) + ". " + currentMenu.getMenuItems().get(i).getTitle());
+            System.out.println((i + 1) + ". " + currentMenu.getMenuItems().get(i).title());
         }
 
         // Вывод кнопки возврата/выхода
@@ -63,14 +63,11 @@ public class Navigator {
             MenuItem selectedItem = currentMenu.getMenuItems().get(choice - 1);
 
             // Выполняем действие пункта меню
-            if (selectedItem.getAction() != null) {
-                selectedItem.getAction().execute();
+            if (selectedItem.action() != null) {
+                selectedItem.action().execute();
             }
 
-            // Обрабатываем навигацию
-            if (selectedItem.getNextMenu() != null) {
-                setCurrentMenu(selectedItem.getNextMenu());
-            }
+
         } else {
             System.out.println("Неверный выбор! Пожалуйста, введите число от 0 до " + currentMenu.getMenuItems().size());
         }

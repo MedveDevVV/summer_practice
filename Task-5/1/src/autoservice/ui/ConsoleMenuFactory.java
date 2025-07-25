@@ -16,17 +16,9 @@ public class ConsoleMenuFactory extends BaseMenuFactory {
     public Menu createMainMenu() {
         Menu mainMenu = new Menu("Главное меню");
 
-        mainMenu.addMenuItem(new MenuItem("Мастера",
-                () -> navigator.setCurrentMenu(createMastersMenu()),
-                null, MenuAction.EXECUTE));
-
-        mainMenu.addMenuItem(new MenuItem("Заказы",
-                () -> navigator.setCurrentMenu(createOrdersMenu()),
-                null, MenuAction.EXECUTE));
-
-        mainMenu.addMenuItem(new MenuItem("Рабочие места",
-                () -> navigator.setCurrentMenu(createPlacesMenu()),
-                null, MenuAction.EXECUTE));
+        mainMenu.addMenuItem(MenuItem.createNaviItem("Мастера", navigator, createMastersMenu()));
+        mainMenu.addMenuItem(MenuItem.createNaviItem("Заказы", navigator, createOrdersMenu()));
+        mainMenu.addMenuItem(MenuItem.createNaviItem("Рабочие места", navigator, createPlacesMenu()));
 
         return mainMenu;
     }
@@ -35,21 +27,14 @@ public class ConsoleMenuFactory extends BaseMenuFactory {
     public Menu createMastersMenu() {
         Menu menu = new Menu("Управление мастерами");
 
-        menu.addMenuItem(new MenuItem("Добавить мастера",
-                new AddMasterAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Добавить мастера",
+                new AddMasterAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Удалить мастера",
-                new RemoveMasterAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Удалить мастера",
+                new RemoveMasterAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Список мастеров",
-                new ListMastersAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
-
-        menu.addMenuItem(new MenuItem("Найти свободных мастеров",
-                new FindAvailableMastersAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Список мастеров",
+                new ListMastersAction(admin, navigator.getScanner())));
 
         return menu;
     }
@@ -58,29 +43,26 @@ public class ConsoleMenuFactory extends BaseMenuFactory {
     public Menu createOrdersMenu() {
         Menu menu = new Menu("Управление заказами");
 
-        menu.addMenuItem(new MenuItem("Создать заказ",
-                new CreateOrderAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Создать заказ",
+                new CreateOrderAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Просмотреть заказ",
-                new GetOrderByIdAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Просмотреть заказ",
+                new GetOrderByIdAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Отменить заказ",
-                new CancelOrderAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Отменить заказ",
+                new CancelOrderAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Завершить заказ",
-                new CloseOrderAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Завершить заказ",
+                new CloseOrderAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Перенести заказ",
-                new DelayOrderAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Перенести заказ",
+                new DelayOrderAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Найти свободную дату",
-                new FindAvailableDateAction(admin),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Найти свободную дату",
+                new FindAvailableDateAction(admin)));
+
+        menu.addMenuItem(MenuItem.createItem("Просмотреть заказы",
+                new ShowOrdersAction(admin, navigator.getScanner())));
 
         return menu;
     }
@@ -89,21 +71,14 @@ public class ConsoleMenuFactory extends BaseMenuFactory {
     public Menu createPlacesMenu() {
         Menu menu = new Menu("Управление рабочими местами");
 
-        menu.addMenuItem(new MenuItem("Добавить рабочее место",
-                new AddPlaceAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Добавить рабочее место",
+                new AddPlaceAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Удалить рабочее место",
-                new RemovePlaceAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Удалить рабочее место",
+                new RemovePlaceAction(admin, navigator.getScanner())));
 
-        menu.addMenuItem(new MenuItem("Список рабочих мест",
-                new ListPlacesAction(admin),
-                null, MenuAction.EXECUTE));
-
-        menu.addMenuItem(new MenuItem("Найти свободные места",
-                new FindAvailablePlacesAction(admin, navigator.getScanner()),
-                null, MenuAction.EXECUTE));
+        menu.addMenuItem(MenuItem.createItem("Найти свободные места",
+                new FindAvailablePlacesAction(admin, navigator.getScanner())));
 
         return menu;
     }

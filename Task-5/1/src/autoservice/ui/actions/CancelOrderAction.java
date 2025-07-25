@@ -1,8 +1,10 @@
 package autoservice.ui.actions;
 
+import autoservice.model.RepairOrder;
 import autoservice.service.AutoServiceAdmin;
 import autoservice.ui.IAction;
 
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -19,12 +21,18 @@ public class CancelOrderAction implements IAction {
     public void execute() {
         System.out.println("\nОтмена заказа:");
         System.out.print("Введите ID заказа: ");
-        String orderIdStr = scanner.next();
+        String orderIdStr = scanner.nextLine();
 
         try {
             UUID orderId = UUID.fromString(orderIdStr);
-            admin.cancelOrder(orderId);
-            System.out.println("Заказ отменен!");
+            Optional<RepairOrder> order = admin.getOrderById(orderId);
+
+            if (order.isPresent()) {
+                admin.cancelOrder(orderId);
+                System.out.println("Заказ отменен!");
+            } else {
+                System.out.println("Заказ с ID " + orderId + " не найден!");
+            }
         } catch (IllegalArgumentException e) {
             System.out.println("Неверный формат ID заказа!");
         }

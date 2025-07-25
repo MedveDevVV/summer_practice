@@ -21,7 +21,7 @@ public class GetOrderByIdAction implements IAction {
     public void execute() {
         System.out.println("\nПросмотр заказа по ID:");
         System.out.print("Введите ID заказа: ");
-        String orderIdStr = scanner.next();
+        String orderIdStr = scanner.nextLine();
 
         try {
             UUID orderId = UUID.fromString(orderIdStr);

@@ -1,31 +1,19 @@
 package autoservice.ui;
 
-public class MenuItem {
-    private final String title;
-    private final IAction action;
-    private final Menu nextMenu;
-    private final MenuAction menuAction;
+public record MenuItem(String title, IAction action) {
 
-    public MenuItem(String title, IAction action, Menu nextMenu, MenuAction menuAction) {
-        this.title = title;
-        this.action = action;
-        this.nextMenu = nextMenu;
-        this.menuAction = menuAction;
+
+    public static MenuItem createNaviItem(String title, Navigator navigator, Menu nextMenu) {
+        return new MenuItem(title, () -> navigator.setCurrentMenu(nextMenu));
     }
 
-    public String getTitle() {
-        return title;
+    public static MenuItem createItem(String title, IAction action) {
+        return new MenuItem(title, action);
     }
 
-    public IAction getAction() {
-        return action;
-    }
-
-    public Menu getNextMenu() {
-        return nextMenu;
-    }
-
-    public MenuAction getMenuAction() {
-        return menuAction;
+    // Фабричный метод для пунктов меню с проверкой доступности
+    public static MenuItem createConditionalItem(String title, IAction action, boolean isAvailable) {
+        return new MenuItem(title, isAvailable ? action : () ->
+                System.out.println("Этот пункт меню недоступен"));
     }
 }

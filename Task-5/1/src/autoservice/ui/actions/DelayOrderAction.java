@@ -1,9 +1,11 @@
 package autoservice.ui.actions;
 
+import autoservice.model.RepairOrder;
 import autoservice.service.AutoServiceAdmin;
 import autoservice.ui.IAction;
 
 import java.time.Period;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -20,17 +22,24 @@ public class DelayOrderAction implements IAction {
     public void execute() {
         System.out.println("\nПеренос заказа:");
         System.out.print("Введите ID заказа: ");
-        String orderIdStr = scanner.next();
-
-        System.out.print("На сколько дней перенести? ");
-        int days = scanner.nextInt();
-
+        String orderIdStr = scanner.nextLine();
+        UUID orderId;
         try {
-            UUID orderId = UUID.fromString(orderIdStr);
-            admin.delayOrder(orderId, Period.ofDays(days));
-            System.out.println("Заказ перенесен на " + days + " дней!");
+            orderId = UUID.fromString(orderIdStr);
+            Optional<RepairOrder> order = admin.getOrderById(orderId);
+            if (order.isEmpty()) {
+                System.out.println("Заказ с ID " + orderId + " не найден!");
+                return;
+            }
         } catch (IllegalArgumentException e) {
             System.out.println("Неверный формат ID заказа!");
+            return;
         }
+        System.out.print("На сколько дней перенести? ");
+        int days = scanner.nextInt();
+        scanner.nextLine();
+
+        admin.delayOrder(orderId, Period.ofDays(days));
+        System.out.println("Заказ перенесен на " + days + " дней!");
     }
 }

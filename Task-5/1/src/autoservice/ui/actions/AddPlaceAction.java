@@ -19,7 +19,7 @@ public class AddPlaceAction implements IAction {
     public void execute() {
         System.out.println("\nДобавление рабочего места:");
         System.out.print("Название места: ");
-        String name = scanner.next();
+        String name = scanner.nextLine();
 
         admin.addWorkshopPlace(new WorkshopPlace(name));
         System.out.println("Рабочее место добавлено!");

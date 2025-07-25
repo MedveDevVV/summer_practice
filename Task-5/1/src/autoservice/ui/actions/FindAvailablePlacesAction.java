@@ -21,7 +21,7 @@ public class FindAvailablePlacesAction implements IAction {
     public void execute() {
         System.out.println("\nПоиск свободных рабочих мест:");
         System.out.print("Введите дату (гггг-мм-дд): ");
-        String dateStr = scanner.next();
+        String dateStr = scanner.nextLine();
 
         try {
             LocalDate date = LocalDate.parse(dateStr);
